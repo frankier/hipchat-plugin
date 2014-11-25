@@ -125,14 +125,13 @@ public class ActiveNotifier implements FineGrainedNotifier {
         HipChatNotifier.HipChatJobProperty jobProperty = project.getProperty(HipChatNotifier.HipChatJobProperty.class);
         MessageBuilder message = new MessageBuilder(notifier, r);
 
-        if (jobProperty.getFailureCount() && (message.build.getResult() == Result.FAILURE)) {
+        message.startMessage();
+
+        if (jobProperty.getFailureCount()) {
             message.appendFailureCount();
-            message.startMessage();
-        }else{
-            message.startMessage();
-            message.appendStatusMessage();
         }
 
+        message.appendStatusMessage();
         message.appendDuration();
 
         return message.appendOpenLink().toString();
@@ -205,12 +204,10 @@ public class ActiveNotifier implements FineGrainedNotifier {
                 Integer totalCount = build.getAction(AbstractTestResultAction.class).getTotalCount();
                 Integer failCount = build.getAction(AbstractTestResultAction.class).getFailCount();
 
-                message.append("<b>" + failCount + "</b>" + " out of " + "<b>" + totalCount + "</b>" + " failed");
-                message.append(" in ");
+                message.append(failCount + " out of " + totalCount + " tests failed ");
             }
             catch (Exception e){
                 logger.info("Unable to get test results!");
-                message.append("MISSING ");
             }
 
             return this;
